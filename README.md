@@ -140,6 +140,26 @@ flowchart TD;
     n_done --> n_render;
 ```
 
+## Project Structure
+
+```text
+.
+|- main.py
+|- app.py
+|- requirements.txt
+|- .gitignore
+|- LICENSE
+|- README.md
+|- modules/
+|  |- __init__.py
+|  |- pdf_to_images/
+|  |  |- __init__.py
+|  |  |- application.py
+|  |  |- gui.py
+|  |  |- models.py
+|  |  |- service.py
+```
+
 ## Contributing
 
 Contributions are welcome.
