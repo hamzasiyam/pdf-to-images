@@ -185,6 +185,12 @@ python main.py
 
 Future recommendation: add `pytest` and automate service-layer tests for conversion logic.
 
+## Statement of AI Use
+
+I use generative AI to accelerate my coding, but strictly maintain a "human in the loop" to ensure accountability and accuracy. Because AI is not a substitute for foundational programming knowledge and can produce confident errors (hallucinations), I actively apply my expertise to debug and refine all automated suggestions.
+
+I am also highly vigilant against AI bias, recognizing that machine learning models can easily absorb and amplify historical inequalities. To build fair applications, I critically evaluate my algorithms and avoid flawed proxies--*using an easily measurable but misleading metric to represent a complex reality, much like using a person's zip code to judge their financial reliability*. By recognizing these limitations, I ensure incomplete data does not unfairly penalize vulnerable groups. Ultimately, the responsibility for the code rests entirely with me.
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
@@ -195,3 +201,5 @@ This README was structured based on the principles outlined in How to Write a Go
 ) by freeCodeCamp.
 
 > **Best Practices Citation:** > [Indentations with Python](https://learn.udacity.com/nd089?version=13.0.8&partKey=cd13568&lessonKey=58044931-0630-4b80-9feb-3586c32e53d7&conceptKey=5386d06d-51e7-4dfa-a407-bbdb7bb42a45)
+
+AI use statement source: [Artificial Intelligence and Career Empowerment (University of Maryland Smith School)](https://www.rhsmith.umd.edu/programs/executive-education/learning-opportunities-individuals/free-online-certificate-artificial-intelligence-and-career-empowerment)
