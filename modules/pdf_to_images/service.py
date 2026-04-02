@@ -43,6 +43,7 @@ def export_pdf_pages(
     options: ExportOptions,
     output_subdir: Path,
     on_page_exported: Callable[[int], None] | None = None,
+    filename_prefix: str = "",
 ) -> int:
     """Export every page from one PDF file into image files.
 
@@ -51,6 +52,8 @@ def export_pdf_pages(
         options: Export settings (output format, DPI, destination root).
         output_subdir: Folder where this PDF's pages are saved.
         on_page_exported: Optional callback invoked with 1-based page index after each save.
+        filename_prefix: Optional string prepended to each image basename (e.g. to avoid
+            collisions when several PDFs share one output folder).
 
     Returns:
         Total number of pages successfully exported for the input PDF.
@@ -61,7 +64,7 @@ def export_pdf_pages(
         for page_index, page in enumerate(doc, start=1):
             # Convert the PDF page into a Pillow image at the requested DPI.
             image = render_page_to_pil(page, options.dpi)
-            filename = f"{pdf_path.stem}_page_{page_index:04d}.{options.image_format}"
+            filename = f"{filename_prefix}{pdf_path.stem}_page_{page_index:04d}.{options.image_format}"
             output_path = output_subdir / filename
             # Write the image to disk using the selected output format.
             save_image(image, output_path, options.image_format)

@@ -14,6 +14,8 @@ class ExportOptions:
         output_dir: Directory where exported images will be written.
         image_format: Output format string, expected values are `"png"` or `"jpg"`.
         dpi: Rendering resolution used to rasterize each PDF page.
+        flat_output: When True, write all images directly under ``output_dir`` with no
+            per-PDF subfolders.
 
     Returns:
         None. This dataclass only stores values for other components to consume.
@@ -22,3 +24,4 @@ class ExportOptions:
     output_dir: Path
     image_format: str
     dpi: int
+    flat_output: bool = False

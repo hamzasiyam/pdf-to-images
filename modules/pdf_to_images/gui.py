@@ -63,6 +63,7 @@ class PdfToImagesApp:
         self.output_dir_var = tk.StringVar(value=str(_default_output_dir()))
         self.format_var = tk.StringVar(value="png")
         self.dpi_var = tk.IntVar(value=300)
+        self.flat_output_var = tk.BooleanVar(value=False)
         self.status_var = tk.StringVar(value="Ready")
 
         self._build_ui()
@@ -136,6 +137,12 @@ class PdfToImagesApp:
             textvariable=self.dpi_var,
             width=8,
         ).grid(row=1, column=3, sticky="w")
+
+        ttk.Checkbutton(
+            options_frame,
+            text="Export all PDFs into one folder (no subfolder per PDF)",
+            variable=self.flat_output_var,
+        ).grid(row=2, column=0, columnspan=4, sticky="w", pady=(8, 0))
 
         progress_frame = ttk.Frame(main)
         progress_frame.grid(row=3, column=0, sticky="ew", pady=(12, 0))
@@ -292,7 +299,12 @@ class PdfToImagesApp:
             return
 
         # Build immutable export options passed into service-layer functions.
-        options = ExportOptions(output_dir=Path(output_dir_raw), image_format=image_format, dpi=dpi)
+        options = ExportOptions(
+            output_dir=Path(output_dir_raw),
+            image_format=image_format,
+            dpi=dpi,
+            flat_output=self.flat_output_var.get(),
+        )
         # Lock controls and initialize progress/logging before worker starts.
         self._set_running_state(True)
         self._set_progress(0, 1)
@@ -334,10 +346,19 @@ class PdfToImagesApp:
             return
 
         exported_pages = 0
-        for pdf_path, page_count in pdf_entries:
-            # Create a dedicated subfolder for this PDF export batch.
-            subdir = unique_subdir(options.output_dir, pdf_path.stem)
-            subdir.mkdir(parents=True, exist_ok=False)
+        num_pdfs = len(pdf_entries)
+        for pdf_index, (pdf_path, page_count) in enumerate(pdf_entries, start=1):
+            if options.flat_output:
+                # All images go directly under the chosen output folder.
+                subdir = options.output_dir
+                # When several PDFs share one folder, prefix basenames so names stay unique.
+                filename_prefix = f"{pdf_index:03d}_" if num_pdfs > 1 else ""
+            else:
+                # Create a dedicated subfolder for this PDF export batch.
+                subdir = unique_subdir(options.output_dir, pdf_path.stem)
+                subdir.mkdir(parents=True, exist_ok=False)
+                filename_prefix = ""
+
             self.root.after(0, lambda p=pdf_path, c=page_count: self._log(f"Processing '{p.name}' ({c} pages)"))
 
             try:
@@ -346,6 +367,7 @@ class PdfToImagesApp:
                     pdf_path=pdf_path,
                     options=options,
                     output_subdir=subdir,
+                    filename_prefix=filename_prefix,
                     on_page_exported=lambda page_idx, p=pdf_path, c=page_count: self.root.after(
                         0, lambda: self._set_status(f"Exporting {p.name} - page {page_idx}/{c}")
                     ),
