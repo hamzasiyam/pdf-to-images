@@ -9,7 +9,7 @@ A modular Python desktop application that converts every page of one or more PDF
 
 ## Project Description
 
-This project is a desktop utility for batch-converting PDF pages into images (`.png` or `.jpg`). Users can select multiple PDFs, choose an output folder, choose format and DPI, and export all pages with progress and logging feedback.
+This project is a desktop utility for batch-converting PDF pages into images (`.png` or `.jpg`). Users can select multiple PDFs, choose an output folder, choose format and DPI, optionally export every PDF into **one shared folder** (no per-PDF subfolders), and export all pages with progress and logging feedback.
 
 The codebase is intentionally split into modules to keep responsibilities clear:
 
@@ -29,8 +29,8 @@ The codebase is intentionally split into modules to keep responsibilities clear:
 ### Challenges solved by this implementation
 
 - Preventing UI freezes during page conversion by running exports on a worker thread.
-- Handling multiple PDFs while preserving per-file output organization.
-- Avoiding output directory naming collisions through unique subfolder generation.
+- Handling multiple PDFs with either per-PDF subfolders or a single flat output folder, depending on user choice.
+- Avoiding naming collisions: unique subfolders when using the default layout, or ordered numeric filename prefixes (`001_`, `002_`, …) when several PDFs share one folder.
 - Providing resilient defaults (e.g., default output folder) and user-friendly validation/errors.
 
 ## Installation
@@ -95,8 +95,11 @@ python app.py
 2. Confirm or change the **Output folder** (defaults to `Downloads` when available).
 3. Choose **Image format** (`png` or `jpg`).
 4. Set **DPI** (default `300`; higher means larger/sharper images).
-5. Click **Start Export**.
-6. Check progress and logs in the application window.
+5. Optionally enable **Export all PDFs into one folder (no subfolder per PDF)**:
+   - **Unchecked (default):** each PDF’s pages are written under a subfolder of the output directory (named from the PDF filename; if that name is already taken, a numeric suffix is added).
+   - **Checked:** all images go directly into the chosen **Output folder**. If you export more than one PDF, filenames are prefixed with `001_`, `002_`, … so files from different PDFs do not overwrite each other. A single PDF keeps the usual pattern, e.g. `document_page_0001.png`.
+6. Click **Start Export**.
+7. Check progress and logs in the application window.
 
 ## Program Flow (Activity Diagram)
 
@@ -106,7 +109,7 @@ flowchart TD;
     n_init["Initialize Tkinter root"];
     n_render["Render PDF to Images GUI"];
     n_select["User selects one or more PDFs"];
-    n_options["User confirms output folder, format, and DPI"];
+    n_options["User confirms output folder, format, DPI, and flat vs per-PDF folders"];
     n_valid{"Input valid?"};
     n_warn["Show validation warning or error"];
     n_thread["Start background export thread"];
@@ -114,7 +117,7 @@ flowchart TD;
     n_scan["Pre-scan PDFs and count pages"];
     n_readable{"Any readable pages?"};
     n_failed["Show export failed message"];
-    n_export["Export each page to PNG or JPG"];
+    n_export["Export each page to PNG or JPG into chosen layout"];
     n_update["Update status, progress, and log"];
     n_more{"More pages or files?"};
     n_done["Show export completed message"];
